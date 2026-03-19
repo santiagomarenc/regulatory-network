@@ -63,16 +63,8 @@ Para resolverlo en Python se utilizarán principalmente:
 - **listas**, para almacenar colecciones de interacciones o genes
 - **diccionarios**, para asociar cada TF con sus genes y resumir la información
 
-## Alcance
 
-Este ejercicio no busca modelar una red de regulación biológica real con toda su complejidad. Solo pretende resolver un problema acotado de organización y resumen de datos regulatorios.
+## Actualización v1.1
 
-No se consideran, por ahora:
-
-- condiciones experimentales
-- intensidad de regulación
-- evidencia biológica
-- regulación indirecta
-- interacciones temporales o contextuales
-
-El objetivo es desarrollar un programa claro, correcto y fácil de extender, aplicando estructuras de datos, iteración y buenas prácticas básicas de organización del código.
+1. los datos (input) serán importados desde la carpeta data/raw/
+2. Los resultados deberán mandarse a un archivo de salida

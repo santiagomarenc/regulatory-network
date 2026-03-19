@@ -267,17 +267,41 @@ def format_summary_v2(rows: List[SummaryV2Row]) -> str:
 
 def main() -> None:
     """
-    Simple demo run for the exercise.
+    Demo run for the exercise.
+    (+) extended version added
+    (+) raw data import
     """
-    interactions: List[Interaction] = [
-        ("AraC", "araA", "+"),
-        ("AraC", "araB", "-"),
-        ("LexA", "recA", "-"),
-        ("CRP", "lacZ", "+"),
-        ("CRP", "lacY", "+"),
-        ("AraC", "araA", "+"),  # exact duplicate, should be removed
-        ("AraC", "araA", "-"),  # same TF/gene, different sign, should be kept
-    ]
+    filename = "data/raw/NetworkRegulatorGene.tsv"
+
+    interactions = List()
+
+    with open(filename) as f:
+        for line in f:
+            line = line.strip()
+
+            #ignore empty lines
+            if not line:
+                continue
+
+            #ignore comment lines
+            if line.startswith("#"):
+                continue
+
+            #ignore heading
+            if line.startswith("1)regulatorId"):
+                continue
+
+            field = line.split("\t")
+
+            #Validate min column number
+            if len(field) <= 6:
+                continue
+
+            TF = field(1)
+            gene = field(4)
+            effect = field(5)
+
+    interactions.append((TF, gene, effect))
 
     summary_v1 = build_summary_v1(interactions)
     summary_v2 = build_summary_v2(interactions)
