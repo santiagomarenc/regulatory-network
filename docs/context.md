@@ -82,3 +82,11 @@ El programa recibirá dos argumentos desde la línea de comandos
 Flujo:
 
 usuario --> CLI --> main()
+
+### Actualización 1.3
+
+Problema:
+El programa no permite filtrar los reguladores por número mínimo de genes.
+
+Nuevo requisito:
+El programa debe permitir filtrar los TFs mostrando solo aquellos que tengan al menos un número mínimo de genes, definido por el argumento `--min_count`.

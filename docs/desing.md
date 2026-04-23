@@ -79,3 +79,13 @@ TF -> genes regulados + conteos por tipo de efecto
 
 ---
 
+## Actualización v1.3
+
+Se introduce un nuevo parámetro `--min_count`.
+
+Diseño:
+
+- Después de construir el regulon, se debe aplicar un filtro
+- El filtro selecciona únicamente los TFs cuyo número de genes sea mayor o igual al valor indicado
+- El filtrado ocurre dentro del bloque `main`, después de construir los `summary_v1` y `summary_v2`
+

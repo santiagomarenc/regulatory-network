@@ -167,3 +167,15 @@ Entrada:
 uv run python regulon_sumary.py input.txt output.txt
 uv run python regulon_sumary.py NetworkRegulatorGene.tsv regulon_summary_output.txt
 ```
+
+## CLI — Filtro por número de genes
+
+### Caso: uso de --min_count
+
+Entrada:
+python script.py input.tsv output.tsv --min_genes 2
+
+Resultado esperado:
+
+- Solo se incluyen TFs con al menos 2 genes
+- El archivo de salida refleja el filtrado correctamente
