@@ -422,6 +422,12 @@ def main() -> None:
         "output",
         help="Nombre del archivo de salida (se guarda en 'results/')",
     )
+    parser.add_argument(
+        "--min_count",
+        type= int,
+        default= 1,
+        help="Número mínimo de genes asociado a un TF para ser mostrado",
+    )
     args = parser.parse_args()
 
 
@@ -434,6 +440,9 @@ def main() -> None:
     
     summary_v1 = build_summary_v1(interactions)
     summary_v2 = build_summary_v2(interactions)
+
+    summary_v1 = [row for row in summary_v1 if row["total"] >= args.min_count]
+    summary_v2 = [row for row in summary_v2 if row["total"] >= args.min_count]
 
     os.makedirs(output_dir, exist_ok=True)
     write_results(output_path, summary_v1, summary_v2)
