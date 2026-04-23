@@ -6,6 +6,30 @@ Interaction = Tuple[str, str, str]
 SummaryV1Row = Dict[str, object]
 SummaryV2Row = Dict[str, object]
 
+# ============================================================
+# Responsabilidad: Verificar argumentos de entrada
+# ============================================================
+
+def parse_arguments(input_path) -> List[Interaction]:
+    """Validates argument parsing
+
+    Expected:
+    - print customized warnings
+    """
+    try:
+        interactions = load_interactions_from_raw_tsv(input_path)
+    except FileNotFoundError:
+        print(f"Error: archivo no encontrado {input_path}")
+        exit(1)
+    except ValueError as exc:
+        print(f"Error en el contenido del archivo: {exc}")
+        exit(1)
+
+    return interactions
+
+# ============================================================
+# Responsabilidad: Procesamiento inicial del archivo, generar lista de interacciones
+# ============================================================
 
 def load_interactions_from_raw_tsv(path: str) -> List[Interaction]:
     """Load interactions from a raw TSV file with comments and extra columns.
@@ -28,39 +52,44 @@ def load_interactions_from_raw_tsv(path: str) -> List[Interaction]:
     required_min_cols = 6
     interactions: List[Interaction] = []
 
+
     with open(path, "r", encoding="utf-8") as f:
-        for line_number, line in enumerate(f, start=1):
-            line =line.strip()
+            for line_number, line in enumerate(f, start=1):
+                line =line.strip()
 
-            if not line:
-                continue
+                if not line:
+                    continue
 
-            if line.startswith("#"):
-                continue
+                if line.startswith("#"):
+                    continue
 
-            if line.startswith("1)regulatorId"):
-                continue
+                if line.startswith("1)regulatorId"):
+                    continue
 
-            fields = line.split("\t")
+                fields = line.split("\t")
 
-            if len(fields) < required_min_cols:
-                continue
+                if len(fields) < required_min_cols:
+                    continue
 
-            tf = fields[tf_col]
-            gene = fields[gene_col]
-            effect = fields[effect_col]
+                tf = fields[tf_col]
+                gene = fields[gene_col]
+                effect = fields[effect_col]
 
-            try:
-                interaction = validate_interaction((tf, gene, effect))
-            except ValueError as exc:
-                raise ValueError(
-                    f"Error parsing line {line_number} in {path!r}: {exc}"
-                ) from exc
+                try:
+                    interaction = validate_interaction((tf, gene, effect))
+                except ValueError as exc:
+                    raise ValueError(
+                        f"Error parsing line {line_number} in {path!r}: {exc}"
+                    ) from exc
+                
+                interactions.append(interaction)
             
-            interactions.append(interaction)
-        
-        return interactions
+            return interactions
 
+
+# ============================================================
+# Responsabilidad: Valida interacciones únicas
+# ============================================================
 
 def validate_interaction(interaction: Sequence[str]) -> Interaction:
     """
@@ -103,6 +132,9 @@ def validate_interaction(interaction: Sequence[str]) -> Interaction:
 
     return tf, gene, effect
 
+# ============================================================
+# Responsabilidad: valida interacciones de manera iterativa
+# ============================================================
 
 def validate_interactions(
     interactions: Iterable[Sequence[str]],
@@ -112,6 +144,9 @@ def validate_interactions(
     """
     return [validate_interaction(interaction) for interaction in interactions]
 
+# ============================================================
+# Responsabilidad: elimina duplas de interacciones duplicadas
+# ============================================================
 
 def deduplicate_exact_interactions(
     interactions: Iterable[Interaction],
@@ -137,6 +172,9 @@ def deduplicate_exact_interactions(
 
     return unique_interactions
 
+# ============================================================
+# Responsabilidad: Clasifica efecto de tf
+# ============================================================
 
 def classify_tf(num_activated: int, num_repressed: int) -> str:
     """
@@ -146,6 +184,7 @@ def classify_tf(num_activated: int, num_repressed: int) -> str:
     - activador: only '+'
     - represor: only '-'
     - dual: both '+' and '-'
+    - desconocido: neither '+' nor '-'
     """
     if num_activated > 0 and num_repressed > 0:
         return "dual"
@@ -156,6 +195,9 @@ def classify_tf(num_activated: int, num_repressed: int) -> str:
 
     return "desconocido"
 
+# ============================================================
+# Responsabilidad: construye el resumen de la primera versión
+# ============================================================
 
 def build_summary_v1(interactions: Iterable[Sequence[str]]) -> List[SummaryV1Row]:
     """
@@ -192,6 +234,9 @@ def build_summary_v1(interactions: Iterable[Sequence[str]]) -> List[SummaryV1Row
 
     return rows
 
+# ============================================================
+# Responsabilidad: construye el resumen de la segunda versión
+# ============================================================
 
 def build_summary_v2(interactions: Iterable[Sequence[str]]) -> List[SummaryV2Row]:
     """
@@ -227,9 +272,9 @@ def build_summary_v2(interactions: Iterable[Sequence[str]]) -> List[SummaryV2Row
 
         summary[tf]["all_genes"].add(gene)
 
-        if effect == "+":
+        if effect in {"+", "+-", "-+"}:
             summary[tf]["activated_genes"].add(gene)
-        elif effect == "-":
+        if effect in {"-", "+-", "-+"}:
             summary[tf]["repressed_genes"].add(gene)
 
     rows: List[SummaryV2Row] = []
@@ -251,6 +296,9 @@ def build_summary_v2(interactions: Iterable[Sequence[str]]) -> List[SummaryV2Row
 
     return rows
 
+# ============================================================
+# Responsabilidad: Aplica formato al resumen v1
+# ============================================================
 
 def format_summary_v1(rows: List[SummaryV1Row]) -> str:
     """
@@ -284,6 +332,9 @@ def format_summary_v1(rows: List[SummaryV1Row]) -> str:
 
     return "\n".join(lines)
 
+# ============================================================
+# Responsabilidad: Aplica formato al resumen v2
+# ============================================================
 
 def format_summary_v2(rows: List[SummaryV2Row]) -> str:
     """
@@ -324,6 +375,9 @@ def format_summary_v2(rows: List[SummaryV2Row]) -> str:
 
     return "\n".join(lines)
 
+# ============================================================
+# Responsabilidad: Escribe los resultados hacia el archivo de salida
+# ============================================================
 
 def write_results(
         path: str,
@@ -342,6 +396,9 @@ def write_results(
         out.write(format_summary_v2(summary_v2))
         out.write("\n")
 
+# ============================================================
+
+# ============================================================
 
 def main() -> None:
     """
@@ -349,15 +406,32 @@ def main() -> None:
     (+) extended version added
     (+) raw data import
     """
-
+    import argparse
+    import sys
     import os
 
-    input_path = "data/raw/NetworkRegulatorGene.tsv"
-    output_dir = "results"
-    output_path = os.path.join(output_dir, "regulon_summary_output.txt")
+    parser = argparse.ArgumentParser(
+        description="Genera resúmenes de regulones desde un TSV crudo."
+    )
     
-    interactions = load_interactions_from_raw_tsv(input_path)
+    parser.add_argument(
+        "input",
+        help="Ruta al archivo TSV de entrada (ej data/network.tsv)",
+    )
+    parser.add_argument(
+        "output",
+        help="Nombre del archivo de salida (se guarda en 'results/')",
+    )
+    args = parser.parse_args()
 
+
+    output_dir = "results"
+    output_path = os.path.join(output_dir, args.output)
+    
+
+    interactions = parse_arguments(args.input)
+    
+    
     summary_v1 = build_summary_v1(interactions)
     summary_v2 = build_summary_v2(interactions)
 

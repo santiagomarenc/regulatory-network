@@ -68,3 +68,17 @@ Para resolverlo en Python se utilizarán principalmente:
 
 1. los datos (input) serán importados desde la carpeta data/raw/
 2. Los resultados deberán mandarse a un archivo de salida
+
+## Actualización 1.2
+
+> Problema:
+> El programa depende de rutas fijas.
+> 
+> Requisito:
+> El programa debe recibir dos argumentos, el archivo de entrada y la ruta de salida
+
+El programa recibirá dos argumentos desde la línea de comandos
+
+Flujo:
+
+usuario --> CLI --> main()

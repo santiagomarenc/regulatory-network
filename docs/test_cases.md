@@ -156,3 +156,14 @@ interactions = [
 * coexistencia de los tres tipos regulatorios
 
 ---
+
+## Command Line Interface (CLI)
+
+Caso: Correr el programa con paso de argumentos.
+
+Entrada:
+
+```bash
+uv run python regulon_sumary.py input.txt output.txt
+uv run python regulon_sumary.py NetworkRegulatorGene.tsv regulon_summary_output.txt
+```
